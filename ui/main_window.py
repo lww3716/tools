@@ -1,7 +1,7 @@
 # ui/main_window.py
 # =======================================================================
 #
-#        全功能控制器 - 主窗口UI模块 (v6.1 - WIFI连接优化版)
+#        全功能控制器 - 主窗口UI模块 (v6.1 - 按钮美化版)
 #
 # =======================================================================
 import json
@@ -49,7 +49,7 @@ from .dialogs import SwiperSettingsDialog, HunterSettingsDialog
 class SwipeApp_PyQt(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("全功能控制器 v6.1 (WIFI连接优化版)")
+        self.setWindowTitle("全功能控制器 v6.1 (按钮美化版)")
         self.setGeometry(100, 100, 1100, 750)
 
         self._define_stylesheets()
@@ -579,11 +579,9 @@ class SwipeApp_PyQt(QMainWindow):
             QMessageBox.critical(self, "错误", "开启TCP/IP模式失败，请检查设备连接。")
             return
 
-        # --- 修改开始: 使用轮询代替固定等待 ---
         self.log("TCP/IP模式已开启，等待设备ADB服务重启...")
 
         device_ip = None
-        # 在5秒内，每0.5秒尝试一次获取IP
         for attempt in range(10):
             ip_result = run_adb(
                 self.adb_path,
@@ -598,7 +596,6 @@ class SwipeApp_PyQt(QMainWindow):
                 self.log(f"成功获取设备IP地址: {device_ip} (在第 {attempt + 1} 次尝试)")
                 break
             time.sleep(0.5)
-        # --- 修改结束 ---
 
         if not device_ip:
             self.log("错误: 无法获取设备IP地址。请确保设备已连接到WIFI。")
@@ -664,36 +661,87 @@ class SwipeApp_PyQt(QMainWindow):
     def _apply_stylesheet(self):
         self.setStyleSheet(self.QSS_DARK)
 
+    # ==================== QSS样式表修改处 ====================
     def _define_stylesheets(self):
-        self.QSS_DARK = """
-            QWidget { background-color: #2E2E2E; color: #F0F0F0; font-family: "Segoe UI", "Microsoft YaHei"; font-size: 10pt; }
-            QGroupBox { border: 1px solid #555; border-radius: 8px; margin-top: 1ex; font-weight: bold; }
-            QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 5px; background-color: #2E2E2E; border-radius: 4px; }
-            QPushButton { background-color: #4A4A4A; border: 1px solid #666; padding: 8px; border-radius: 4px; }
-            QPushButton:hover { background-color: #5A5A5A; }
-            QPushButton:pressed { background-color: #3D3D3D; }
-            QPushButton:disabled { background-color: #404040; color: #888; }
-            QPushButton#StartButton { background-color: #28a745; font-size: 12pt; font-weight: bold; }
-            QPushButton#StartButton:hover { background-color: #218838; }
-            QPushButton#StopButton { background-color: #dc3545; font-size: 12pt; font-weight: bold; }
-            QPushButton#StopButton:hover { background-color: #c82333; }
-            QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox { background-color: #252525; border: 1px solid #555; border-radius: 4px; padding: 4px; }
+        common_styles = """
+            QGroupBox { 
+                border-radius: 8px; margin-top: 1ex; font-weight: bold; 
+            }
+            QGroupBox::title { 
+                subcontrol-origin: margin; subcontrol-position: top left; 
+                padding: 0 5px; border-radius: 4px; 
+            }
+            QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox { 
+                border-radius: 4px; padding: 4px; 
+            }
             QComboBox::drop-down { border: none; }
             QLabel { background-color: transparent; }
         """
-        self.QSS_LIGHT = """
-            QWidget { background-color: #F0F0F0; color: #202020; font-family: "Segoe UI", "Microsoft YaHei"; font-size: 10pt; }
-            QGroupBox { border: 1px solid #CCCCCC; border-radius: 8px; margin-top: 1ex; font-weight: bold; }
-            QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 5px; background-color: #F0F0F0; border-radius: 4px; }
-            QPushButton { background-color: #E0E0E0; border: 1px solid #BDBDBD; padding: 8px; border-radius: 4px; }
-            QPushButton:hover { background-color: #E8E8E8; }
-            QPushButton:pressed { background-color: #D5D5D5; }
-            QPushButton:disabled { background-color: #EAEAEA; color: #AAAAAA; }
-            QPushButton#StartButton { background-color: #28a745; color: white; font-size: 12pt; font-weight: bold; }
-            QPushButton#StartButton:hover { background-color: #218838; }
-            QPushButton#StopButton { background-color: #dc3545; color: white; font-size: 12pt; font-weight: bold; }
-            QPushButton#StopButton:hover { background-color: #c82333; }
-            QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox { background-color: #FFFFFF; border: 1px solid #CCCCCC; border-radius: 4px; padding: 4px; }
-            QComboBox::drop-down { border: none; }
-            QLabel { background-color: transparent; }
+        self.QSS_DARK = f"""
+            QWidget {{ 
+                background-color: #2E2E2E; color: #F0F0F0; 
+                font-family: "Segoe UI", "Microsoft YaHei"; font-size: 10pt; 
+            }}
+            {common_styles}
+            QGroupBox {{ border: 1px solid #555; }}
+            QGroupBox::title {{ background-color: #2E2E2E; }}
+            QPushButton {{
+                background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #555, stop:1 #4A4A4A);
+                border: 1px solid #666;
+                border-bottom: 3px solid #333;
+                padding: 6px 12px;
+                border-radius: 5px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{ background-color: #5A5A5A; }}
+            QPushButton:pressed {{
+                background-color: #3D3D3D;
+                border-style: inset;
+                padding-top: 8px;
+            }}
+            QPushButton:disabled {{ background-color: #404040; color: #888; border-bottom: 3px solid #282828;}}
+
+            QPushButton#StartButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34c759, stop:1 #28a745); border-bottom-color: #1D7733; color: white; }}
+            QPushButton#StartButton:hover {{ background-color: #30d55b; }}
+            QPushButton#StartButton:pressed {{ background-color: #218838; border-style: inset; padding-top: 8px; }}
+            
+            QPushButton#StopButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ff453a, stop:1 #dc3545); border-bottom-color: #A92834; color: white; }}
+            QPushButton#StopButton:hover {{ background-color: #ff5b52; }}
+            QPushButton#StopButton:pressed {{ background-color: #c82333; border-style: inset; padding-top: 8px; }}
+
+            QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox {{ background-color: #252525; border: 1px solid #555; }}
+        """
+        self.QSS_LIGHT = f"""
+            QWidget {{ 
+                background-color: #F0F2F5; color: #1c1c1e; 
+                font-family: "Segoe UI", "Microsoft YaHei"; font-size: 10pt; 
+            }}
+            {common_styles}
+            QGroupBox {{ border: 1px solid #D1D1D6; }}
+            QGroupBox::title {{ background-color: #F0F2F5; }}
+            QPushButton {{
+                background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFFFFF, stop:1 #F0F0F0);
+                border: 1px solid #C6C6C8;
+                border-bottom: 3px solid #BDBDBD;
+                padding: 6px 12px;
+                border-radius: 5px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{ background-color: #E8E8E8; }}
+            QPushButton:pressed {{
+                background-color: #DCDCDC;
+                border-style: inset;
+                padding-top: 8px;
+            }}
+            QPushButton:disabled {{ background-color: #EAEAEA; color: #AAAAAA; border-bottom: 3px solid #CECECE; }}
+
+            QPushButton#StartButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34c759, stop:1 #28a745); border-bottom-color: #1D7733; color: white; }}
+            QPushButton#StartButton:hover {{ background-color: #30d55b; }}
+            QPushButton#StartButton:pressed {{ background-color: #218838; border-style: inset; padding-top: 8px; }}
+            
+            QPushButton#StopButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ff453a, stop:1 #dc3545); border-bottom-color: #A92834; color: white; }}
+            QPushButton#StopButton:hover {{ background-color: #ff5b52; }}
+            QPushButton#StopButton:pressed {{ background-color: #c82333; border-style: inset; padding-top: 8px; }}
+            
+            QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox {{ background-color: #FFFFFF; border: 1px solid #C6C6C8; }}
         """
