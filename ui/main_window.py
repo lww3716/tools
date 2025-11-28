@@ -1,7 +1,7 @@
 # ui/main_window.py
 # =======================================================================
 #
-#        全功能控制器 - 主窗口UI模块 (v6.1 - 按钮美化版)
+#        全功能控制器 - 主窗口UI模块 (v6.2 - 图标支持版)
 #
 # =======================================================================
 import json
@@ -10,6 +10,7 @@ import subprocess
 from pathlib import Path
 import os
 import re
+import sys  # <--- 新增导入
 
 from PyQt6.QtWidgets import (
     QMainWindow,
@@ -27,6 +28,7 @@ from PyQt6.QtWidgets import (
     QInputDialog,
 )
 from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QIcon  # <--- 新增导入
 
 # 从自定义模块中导入
 from config import (
@@ -46,10 +48,34 @@ from core.image_hunter import ImageHunter
 from .dialogs import SwiperSettingsDialog, HunterSettingsDialog
 
 
+# --- ↓↓↓ 新增的关键函数 ↓↓↓ ---
+def resource_path(relative_path):
+    """
+    获取资源的绝对路径, 解决打包后PyInstaller找不到资源的问题。
+    """
+    try:
+        # PyInstaller 会创建一个临时文件夹, 并将路径存储在 _MEIPASS 中
+        base_path = sys._MEIPASS
+    except Exception:
+        # 如果不是在打包后的环境中运行，则使用常规路径
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+# --- ↑↑↑ 新增结束 ↑↑↑ ---
+
+
 class SwipeApp_PyQt(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("全功能控制器 v6.1 (按钮美化版)")
+        self.setWindowTitle("全功能控制器 v6.2 (图标支持版)")
+
+        # --- ↓↓↓ 新增图标设置代码 ↓↓↓ ---
+        icon_path = resource_path("tools.ico")
+        self.setWindowIcon(QIcon(icon_path))
+        # --- ↑↑↑ 新增结束 ↑↑↑ ---
+
         self.setGeometry(100, 100, 1100, 750)
 
         self._define_stylesheets()
@@ -204,6 +230,8 @@ class SwipeApp_PyQt(QMainWindow):
         layout.addStretch(1)
         self.main_layout.addWidget(right_widget)
 
+    # ... (此文件中的其他所有方法保持不变，此处省略以保持简洁) ...
+    # ... 您只需要确保上面的 __init__ 方法和文件顶部的 import 被正确更新即可 ...
     def _connect_signals(self):
         self.theme_btn.clicked.connect(self._toggle_theme)
         self.refresh_devices_btn.clicked.connect(self.refresh_devices)
@@ -661,7 +689,6 @@ class SwipeApp_PyQt(QMainWindow):
     def _apply_stylesheet(self):
         self.setStyleSheet(self.QSS_DARK)
 
-    # ==================== QSS样式表修改处 ====================
     def _define_stylesheets(self):
         common_styles = """
             QGroupBox { 
@@ -701,11 +728,11 @@ class SwipeApp_PyQt(QMainWindow):
             }}
             QPushButton:disabled {{ background-color: #404040; color: #888; border-bottom: 3px solid #282828;}}
 
-            QPushButton#StartButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34c759, stop:1 #28a745); border-bottom-color: #1D7733; color: white; }}
+            QPushButton#StartButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34c759, stop:1 #28a745); border-bottom-color: #1D7733; color: white; font-size: 12pt; }}
             QPushButton#StartButton:hover {{ background-color: #30d55b; }}
             QPushButton#StartButton:pressed {{ background-color: #218838; border-style: inset; padding-top: 8px; }}
             
-            QPushButton#StopButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ff453a, stop:1 #dc3545); border-bottom-color: #A92834; color: white; }}
+            QPushButton#StopButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ff453a, stop:1 #dc3545); border-bottom-color: #A92834; color: white; font-size: 12pt;}}
             QPushButton#StopButton:hover {{ background-color: #ff5b52; }}
             QPushButton#StopButton:pressed {{ background-color: #c82333; border-style: inset; padding-top: 8px; }}
 
@@ -735,11 +762,11 @@ class SwipeApp_PyQt(QMainWindow):
             }}
             QPushButton:disabled {{ background-color: #EAEAEA; color: #AAAAAA; border-bottom: 3px solid #CECECE; }}
 
-            QPushButton#StartButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34c759, stop:1 #28a745); border-bottom-color: #1D7733; color: white; }}
+            QPushButton#StartButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34c759, stop:1 #28a745); border-bottom-color: #1D7733; color: white; font-size: 12pt;}}
             QPushButton#StartButton:hover {{ background-color: #30d55b; }}
             QPushButton#StartButton:pressed {{ background-color: #218838; border-style: inset; padding-top: 8px; }}
             
-            QPushButton#StopButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ff453a, stop:1 #dc3545); border-bottom-color: #A92834; color: white; }}
+            QPushButton#StopButton {{ background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ff453a, stop:1 #dc3545); border-bottom-color: #A92834; color: white; font-size: 12pt;}}
             QPushButton#StopButton:hover {{ background-color: #ff5b52; }}
             QPushButton#StopButton:pressed {{ background-color: #c82333; border-style: inset; padding-top: 8px; }}
             
