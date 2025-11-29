@@ -1,22 +1,15 @@
 # ui/dialogs.py
 # =======================================================================
 #
-#        全功能控制器 - 设置对话框模块
+#        全功能控制器 - 设置对话框模块 (V5.3 逻辑更新)
 #
 # =======================================================================
 from PyQt6.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QGridLayout,
-    QDialogButtonBox,
-    QLabel,
-    QDoubleSpinBox,
-    QSpinBox,
-    QCheckBox,
+    QDialog, QVBoxLayout, QGridLayout, QDialogButtonBox, QLabel,
+    QDoubleSpinBox, QSpinBox, QCheckBox
 )
 
 from config import IMAGE_FOLDER_SWIPER, IMAGE_FOLDER_SWIPER_GATE, IMAGE_FOLDER_HUNTER
-
 
 class SettingsDialog(QDialog):
     def __init__(self, title, parent=None):
@@ -65,6 +58,9 @@ class SwiperSettingsDialog(SettingsDialog):
         self.start_condition_enabled = QCheckBox(
             f"启用P1启动条件 (扫描: {IMAGE_FOLDER_SWIPER_GATE.name})"
         )
+        self.confidence = QDoubleSpinBox(
+            decimals=2, minimum=0.1, maximum=1.0, singleStep=0.05
+        )
 
         self._add_row(0, "起点 (X/Y):", self.start_x, self.start_y)
         self._add_row(1, "终点 (X/Y):", self.end_x, self.end_y)
@@ -79,6 +75,7 @@ class SwiperSettingsDialog(SettingsDialog):
         )
         self.grid_layout.addWidget(self.detection_enabled, 7, 0, 1, 3)
         self.grid_layout.addWidget(self.start_condition_enabled, 8, 0, 1, 3)
+        self._add_row(9, "P1 匹配可信度(0.1-1.0):", self.confidence)
 
         self.populate_fields()
 
@@ -99,6 +96,7 @@ class SwiperSettingsDialog(SettingsDialog):
         self.start_condition_enabled.setChecked(
             self.config.get("p1_start_condition_enabled", False)
         )
+        self.confidence.setValue(self.config.get("confidence", 0.8))
 
     def get_config(self):
         return {
@@ -116,6 +114,7 @@ class SwiperSettingsDialog(SettingsDialog):
             "interval_max": self.interval_max.value(),
             "detection_enabled": self.detection_enabled.isChecked(),
             "p1_start_condition_enabled": self.start_condition_enabled.isChecked(),
+            "confidence": self.confidence.value(),
         }
 
 
